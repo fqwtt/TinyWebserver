@@ -16,7 +16,7 @@ Log::Log(){
 }
 
 Log::~Log(){
-	if(this->m_fp!=NULL){
+	if(this->m_fp!=nullptr){
 		fclose(this->m_fp);
 	}
 }
@@ -26,7 +26,7 @@ bool Log::init(const char* file_name,int close_log,int log_buf,int log_buf_size,
 		this->m_is_async=true;
 		this->m_log_queue=new block_queue<string>(max_queue_size);
 		pthread_t tid;
-		pthread_create(&tid,NULL,flush_log_thread,NULL);
+		pthread_create(&tid,nullptr,flush_log_thread,nullptr);
 	}
 	this->m_close_log=close_log;
 	this->m_log_buf_size=log_buf_size;
@@ -34,14 +34,14 @@ bool Log::init(const char* file_name,int close_log,int log_buf,int log_buf_size,
 	memset(this->m_buf,'\0',log_buf_size);
 	this->m_max_lines=max_lines;
 
-	time_t t=time(NULL);
+	time_t t=time(nullptr);
 	struct tm* sys_tm=localtime(&t);
 	struct tm my_tm=*sys_tm;
 
 	const char* p=strrchr(file_name,'/');
 	char log_full_name[256]={0};
 
-	if(p==NULL){
+	if(p==nullptr){
 		snprintf(log_full_name,255,"%d_%02d_%02d_%s",my_tm.tm_year+1900,my_tm.tm_mon+1,my_tm.tm_mday,file_name);
 	}
 	else{
@@ -51,7 +51,7 @@ bool Log::init(const char* file_name,int close_log,int log_buf,int log_buf_size,
 	}
 	this->m_today=my_tm.tm_mday;
 	this->m_fp=fopen(log_full_name,"a");
-	if (this->m_fp==NULL){
+	if (this->m_fp==nullptr){
 		return false;
 	}
 	return true;
@@ -60,7 +60,7 @@ bool Log::init(const char* file_name,int close_log,int log_buf,int log_buf_size,
 void Log::write_log(int level, const char *format, ...)
 {
 	struct timeval now = {0, 0};
-	gettimeofday(&now, NULL);
+	gettimeofday(&now, nullptr);
 	time_t t = now.tv_sec;
 	struct tm *sys_tm = localtime(&t);
 	struct tm my_tm = *sys_tm;
