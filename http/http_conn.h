@@ -7,13 +7,16 @@
 #ifndef HTTP_CONN_H
 #define HTTP_CONN_H
 
+#include <fcntl.h>
 #include <mysql/mysql.h>
 #include <netinet/in.h>
+#include <sys/epoll.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include <map>
-#include <string>
 #include <mutex>
+#include <string>
 
 #include "../CGImysql/sql_connection_pool.h"
 

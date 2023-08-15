@@ -13,6 +13,7 @@ OUTPUT_VARIABLE MYSQL_LIBS OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # 添加可执行文件
 add_executable(main main.cpp CGImysql/sql_connection_pool.cpp http/http_conn.cpp)
+add_executable(test test.cpp)
 
 target_compile_options(main PUBLIC ${MYSQL_CFLAGS})
 target_link_libraries(main PUBLIC ${MYSQL_LIBS})

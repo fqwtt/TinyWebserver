@@ -12,8 +12,8 @@
 #include <vector>
 
 #include "CGImysql/sql_connection_pool.h"
+#include "http/http_conn.h"
 #include "config.h"
-
 using namespace std;
 
 string getRandStr(int n) {
@@ -36,7 +36,6 @@ void doInsert(connection_pool* pool) {
   mysql_query(mysql, "use test");
   mysql_query(mysql, sql.c_str());
 }
-enum mm { a = 0, b, c };
 int main(int argc, char* argv[]) {
   // cout << argc << endl;
   // int opt;
@@ -47,6 +46,15 @@ int main(int argc, char* argv[]) {
   //   }
   //   cout << optarg << endl;
   // }
-  printf("%s\n", getRandStr(10).c_str());
+  connection_pool* pool = connection_pool::GetInstance();
+  string host = "8.146.250.215";
+  string user = "root";
+  string passwd = "P@ssw0rd";
+  string database = "test";
+  int port = 3306;
+  pool->init(host, user, passwd, database, port, 10, 1);
+  http_conn h;
+  h.initmysql_result(pool);
+  
   return 0;
 }
