@@ -27,7 +27,8 @@ class connection_pool {
 
   static connection_pool* GetInstance();
 
-  void init(string url, string User, string Passward, string DataBaseName, int port, int MaxConn, int close_log);
+  void init(string url, string User, string Passward, string DataBaseName,
+            int port, int MaxConn, int close_log);
 
  private:
   connection_pool();

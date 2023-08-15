@@ -17,3 +17,4 @@ add_executable(test test.cpp)
 
 target_compile_options(main PUBLIC ${MYSQL_CFLAGS})
 target_link_libraries(main PUBLIC ${MYSQL_LIBS})
+target_link_libraries(main PUBLIC mysqlclient)

@@ -4,9 +4,9 @@
   > Created Time: 2023年05月31日 星期三 10时11分17秒
  ************************************************************************/
 
-#include "sql_connection_pool.h"
-
 #include <iostream>
+
+#include "sql_connection_pool.h"
 
 using namespace std;
 
@@ -61,7 +61,8 @@ connection_pool* connection_pool::GetInstance() {
   return &connPool;
 }
 
-void connection_pool::init(string host, string User, string Passward, string DataBaseName, int port, int MaxConn,
+void connection_pool::init(string host, string User, string Passward,
+                           string DataBaseName, int port, int MaxConn,
                            int close_log) {
   this->m_host = host;
   this->m_User = User;
@@ -78,7 +79,8 @@ void connection_pool::init(string host, string User, string Passward, string Dat
       exit(1);
     }
     conn =
-        mysql_real_connect(conn, host.c_str(), User.c_str(), Passward.c_str(), DataBaseName.c_str(), port, nullptr, 0);
+        mysql_real_connect(conn, host.c_str(), User.c_str(), Passward.c_str(),
+                           DataBaseName.c_str(), port, nullptr, 0);
     if (!conn) {
       cout << "error" << endl;  // 需要修改
       exit(1);
@@ -95,4 +97,6 @@ connectionRAII::connectionRAII(MYSQL** con, connection_pool* connPool) {
   this->poolRAII = connPool;
 }
 
-connectionRAII::~connectionRAII() { this->poolRAII->ReleaseConnection(this->conRAII); }
+connectionRAII::~connectionRAII() {
+  this->poolRAII->ReleaseConnection(this->conRAII);
+}
