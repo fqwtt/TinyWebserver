@@ -4,57 +4,60 @@
   > Created Time: 2023年05月31日 星期三 10时11分08秒
  ************************************************************************/
 
-#include <iostream>
+#ifndef SQL_CONNECTION_POOL_H
+#define SQL_CONNECTION_POOL_H
 #include <mysql/mysql.h>
 #include <semaphore.h>
-#include <mutex>
+
+#include <iostream>
 #include <list>
+#include <mutex>
 
 using namespace std;
 
 class connection_pool {
-public:
-    MYSQL *Getconnection();
+ public:
+  MYSQL* Getconnection();
 
-    bool ReleaseConnection(MYSQL *conn);
+  bool ReleaseConnection(MYSQL* conn);
 
-    int GetFreeConn();
+  int GetFreeConn();
 
-    void DestroyPool();
+  void DestroyPool();
 
-    static connection_pool *GetInstance();
+  static connection_pool* GetInstance();
 
-    void init(string url, string User, string Passward, string DataBaseName, int port, int MaxConn, int close_log);
+  void init(string url, string User, string Passward, string DataBaseName, int port, int MaxConn, int close_log);
 
-private:
-    connection_pool();
+ private:
+  connection_pool();
 
-    ~connection_pool();
+  ~connection_pool();
 
-    int m_MaxConn;
-    int m_CurrConn;
-    int m_FreeConn;
-    mutex m_mux;
-    sem_t m_sem;
-    list<MYSQL *> m_connList;
+  int m_MaxConn;
+  int m_CurrConn;
+  int m_FreeConn;
+  mutex m_mux;
+  sem_t m_sem;
+  list<MYSQL*> m_connList;
 
-public:
-    string m_url;
-    string m_Port;
-    string m_User;
-    string m_PassWord;
-    string m_DatabaseName;
-    int m_close_log;
+ public:
+  string m_host;
+  string m_Port;
+  string m_User;
+  string m_PassWord;
+  string m_DatabaseName;
+  int m_close_log;
 };
 
 class connectionRAII {
-public:
-    connectionRAII(MYSQL **con, connection_pool *connPool);
+ public:
+  connectionRAII(MYSQL** con, connection_pool* connPool);
 
-    ~connectionRAII();
+  ~connectionRAII();
 
-private:
-    MYSQL *conRAII;
-    connection_pool *poolRAII;
+ private:
+  MYSQL* conRAII;
+  connection_pool* poolRAII;
 };
-
+#endif

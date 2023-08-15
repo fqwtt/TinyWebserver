@@ -1,0 +1,69 @@
+BasedOnStyle: Google
+Standard: c++11
+
+# Some folks prefer to write "int& foo" while others prefer "int &foo".  The
+# Google Style Guide only asks for consistency within a project, we chose
+# "int& foo" for this project:
+DerivePointerAlignment: false
+PointerAlignment: Left
+
+ColumnLimit: 120
+
+# Prevent Xcgi Xwi combine tag comments being separated
+CommentPragmas: '\{\{[[:space:]]*[A-Z0-9_]+(BLOCK|SLOT)_(BEGIN|END)'
+
+IncludeBlocks: Regroup
+
+IncludeCategories:
+  # Standard C Lirary (https://en.cppreference.com/w/c/header)
+  - Regex:           '^<(assert\.h|complex\.h|ctype\.h|errno\.h|fenv\.h|float\.h|inttypes\.h|iso646\.h|limits\.h|locale\.h|math\.h|setjmp\.h|signal\.h|stdalign\.h|stdarg\.h|stdatomic\.h|stdbool\.h|stddef\.h|stdint\.h|stdio\.h|stdlib\.h|stdnoreturn\.h|string\.h|tgmath\.h|threads\.h|time\.h|uchar\.h|wchar\.h|wctype\.h)>$'
+    Priority:        1
+
+  # Standard C++ Lirary
+  - Regex:           '^<(algorithm|any|array|atomic|bitset|cassert|ccomplex|cctype|cerrno|cfenv|cfloat|charconv|chrono|cinttypes|ciso646|climits|clocale|cmath|codecvt|compare|complex|condition_variable|csetjmp|csignal|cstdarg|cstdbool|cstddef|cstdint|cstdio|cstdlib|cstring|ctgmath|ctime|cwchar|cwctype|deque|exception|experimental/algorithm|experimental/any|experimental/chrono|experimental/coroutine|experimental/deque|experimental/dynarray|experimental/filesystem|experimental/forward_list|experimental/functional|experimental/iterator|experimental/list|experimental/map|experimental/memory_resource|experimental/numeric|experimental/optional|experimental/propagate_const|experimental/ratio|experimental/regex|experimental/set|experimental/simd|experimental/string|experimental/string_view|experimental/system_error|experimental/tuple|experimental/type_traits|experimental/unordered_map|experimental/unordered_set|experimental/utility|experimental/vector|ext/hash_map|ext/hash_set|filesystem|forward_list|fstream|functional|future|initializer_list|iomanip|ios|iosfwd|iostream|istream|iterator|limits|list|locale|map|memory|mutex|new|numeric|optional|ostream|queue|random|ratio|regex|scoped_allocator|set|shared_mutex|span|sstream|stack|stdexcept|streambuf|string|string_view|strstream|support/android|support/fuchsia|support/ibm|support/musl|support/newlib|support/solaris|support/win32|support/xlocale|system_error|thread|tuple|type_traits|typeindex|typeinfo|unordered_map|unordered_set|utility|valarray|variant|vector|version)>$'
+    Priority:        10
+
+  # Headers in <> with extension. (linux headers)
+  - Regex:           '^<([A-Za-z0-9.\Q/-_\E])+>$'
+    Priority:        2
+
+  # Headers in <> without extension. (system wide C++ headers)
+  - Regex:           '^<([A-Za-z0-9\Q/-_\E])+>$'
+    Priority:        11
+
+
+  # Common used librarys
+  - Regex:           '^"(include|3dept|3rd|mm3rd|mm3rd2|google|gmock|boost|json|openssl|mysql\+\+|tclap|fmt|dry-basic|dry-platform|mmcontrib|wqueue|folly)/.+$'
+    Priority:        100
+
+  # Svrkit craps
+  - Regex:           '^"(mmproto|basic|comm|comm2|mmcomm|appplatform|antispam|oss|mmoss|platform|prservice)/.+$'
+    Priority:        200
+
+  # gateway clients
+  - Regex:           '^"(ilinkappfacegateway|ilinkgateway|imuniongateway|mmadgateway|mmaegateway|mmbizgateway|mmdatagateway|mmgamegateway|mmgateway|mmlifegateway|mmocbizgateway|mmossgateway|mmpaygateway|mmpaygitgateway|mmsearchgateway|mmspamgateway|mmuxgateway|phxgateway|mmbizgateway2|mmgoggateway|mmgoggateway2|prgateway)/.+$'
+    Priority:        2000
+
+  # private package libs
+  - Regex:           '^"(mmbd|mmgog2|mmpay|mmpay_git|mmpay_svn_sec|mmreader|mmtenpay|mmtenpay_bazel|mmtools|phxqueue|phxqueueapp)/.+$'
+    Priority:        2100
+
+  # Remains
+  - Regex:           '^.+$'
+    Priority:        3000
+
+# https://git.woa.com/standards/cpp#920%E5%BF%85%E9%A1%BB%E5%9E%82%E7%9B%B4%E7%95%99%E7%99%BD 注释格式
+# 行注释 "//" 前增加两个空格
+SpacesBeforeTrailingComments: 2
+# 注释内容和注释符号//之间最少1个空格
+SpacesInLineCommentPrefix:
+  Minimum: 1
+  Maximum: -1
+
+# https://git.woa.com/standards/cpp#920%E5%BF%85%E9%A1%BB%E5%9E%82%E7%9B%B4%E7%95%99%E7%99%BD 原则上空行越少越好
+# 代码块开始处无空行
+KeepEmptyLinesAtTheStartOfBlocks: false
+# public\protected\private后面无空行
+EmptyLineAfterAccessModifier: Never
+# public\protected\private前面有空行
+EmptyLineBeforeAccessModifier: Always

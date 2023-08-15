@@ -7,81 +7,80 @@
 #ifndef LST_TIMER_H
 #define LST_TIMER_H
 
-#include <iostream>
 #include <netinet/in.h>
+
+#include <iostream>
 
 class util_timer;
 
 struct client_data {
-    sockaddr_in address;
-    int sockfd;
-    util_timer *timer;
+  sockaddr_in address;
+  int sockfd;
+  util_timer* timer;
 };
 
 class util_timer {
-public:
-    util_timer() : prev(nullptr), next(nullptr) {}
+ public:
+  util_timer() : prev(nullptr), next(nullptr) {}
 
-public:
-    time_t expire;
+ public:
+  time_t expire;
 
-    void (*cb_func)(client_data *);
+  void (*cb_func)(client_data*);
 
-    client_data *user_data;
-    util_timer *prev;
-    util_timer *next;
-
+  client_data* user_data;
+  util_timer* prev;
+  util_timer* next;
 };
 
 class sort_timer_lst {
-public:
-    sort_timer_lst();
+ public:
+  sort_timer_lst();
 
-    ~sort_timer_lst();
+  ~sort_timer_lst();
 
-    void add_timer(util_timer *timer);
+  void add_timer(util_timer* timer);
 
-    void adjust_timer(util_timer *timer);
+  void adjust_timer(util_timer* timer);
 
-    void del_timer(util_timer *timer);
+  void del_timer(util_timer* timer);
 
-    void tick();
+  void tick();
 
-private:
-    void add_timer(util_timer *timer, util_timer *lst_head);
+ private:
+  void add_timer(util_timer* timer, util_timer* lst_head);
 
-    util_timer *head;
-    util_timer *tail;
+  util_timer* head;
+  util_timer* tail;
 };
 
 class Utils {
-public:
-    Utils() {}
+ public:
+  Utils() {}
 
-    ~Utils() {}
+  ~Utils() {}
 
-    void init(int timeslot);
+  void init(int timeslot);
 
-    int setnonblocking(int fd);
+  int setnonblocking(int fd);
 
-    void addfd(int epollfd, int fd, bool one_shot, int TRIGMode);
+  void addfd(int epollfd, int fd, bool one_shot, int TRIGMode);
 
-    static void sig_handler(int sig);
+  static void sig_handler(int sig);
 
-    void addsig(int sig, void(handler)(int), bool restart = true);
+  void addsig(int sig, void(handler)(int), bool restart = true);
 
-    void timer_handler();
+  void timer_handler();
 
-    void show_error(int connfd, const char *info);
+  void show_error(int connfd, const char* info);
 
-public:
-    static int *u_pipefd;
-    sort_timer_lst m_timer_lst;
-    static int u_epollfd;
-    int m_TIMESLOT;
-
+ public:
+  static int* u_pipefd;
+  sort_timer_lst m_timer_lst;
+  static int u_epollfd;
+  int m_TIMESLOT;
 };
 
-void cb_func(client_data *user_data);
+void cb_func(client_data* user_data);
 
 #endif

@@ -6,59 +6,60 @@
 #ifndef WEBSERVER_H
 #define WEBSERVER_H
 
-#include <iostream>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
 #include <stdlib.h>
+
+#include <arpa/inet.h>
+#include <netinet/in.h>
 #include <sys/epoll.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
 #include <cassert>
-#include <sys/epoll.h>
-#include "./timer/lst_timer.h"
+#include <iostream>
+
 #include "./http/http_conn.h"
+#include "./timer/lst_timer.h"
 
 using namespace std;
-const int MAX_FD = 65536;             //最大文件描述符
-const int MAX_EVENT_NUMBER = 10000;   //最大事件数
-const int TIMESLOT = 5;               //最小超时单位
+const int MAX_FD = 65536;            // 最大文件描述符
+const int MAX_EVENT_NUMBER = 10000;  // 最大事件数
+const int TIMESLOT = 5;              // 最小超时单位
 
 class WebServer {
-public:
-    WebServer();
+ public:
+  WebServer();
 
-    ~WebServer();
+  ~WebServer();
 
-    void init(int port, string user, string passWord, string databaseName,
-              int logWrite, int optLinger, int trigMode, int sqlNum,
-              int threadNum, int closeLog, int actorModel);
+  void init(int port, string user, string passWord, string databaseName, int logWrite, int optLinger, int trigMode,
+            int sqlNum, int threadNum, int closeLog, int actorModel);
 
-    void threadPool();
+  void threadPool();
 
-    void sqlPool();
+  void sqlPool();
 
-    void logWrite();
+  void logWrite();
 
-    void trigMode();
+  void trigMode();
 
-    void eventListen();
+  void eventListen();
 
-    void eventLoop();
+  void eventLoop();
 
-    void timer(int connfd, sockaddr_in client_address);
+  void timer(int connfd, sockaddr_in client_address);
 
-    void adjustTimer(util_timer *timer, int sockfd);
+  void adjustTimer(util_timer* timer, int sockfd);
 
-public:
-    int m_port;
-    char *m_root;
-    int m_logWrite;
-    int m_closeLog;
-    int m_actorModel;
+ public:
+  int m_port;
+  char* m_root;
+  int m_logWrite;
+  int m_closeLog;
+  int m_actorModel;
 
-    int m_pipefd[2];
-    int m_epollfd;
-    http_conn *users;
+  int m_pipefd[2];
+  int m_epollfd;
+  http_conn* users;
 };
 
 #endif
