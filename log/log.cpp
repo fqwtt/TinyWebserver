@@ -23,7 +23,7 @@ Log::~Log() {
   }
 }
 
-bool Log::init(const char* file_name, int close_log, int log_buf, int log_buf_size, int max_lines, int max_queue_size) {
+bool Log::init(const char* file_name, int close_log, int log_buf_size, int max_lines, int max_queue_size) {
   if (max_queue_size >= 1) {
     this->m_is_async = true;
     this->m_log_queue = new block_queue<string>(max_queue_size);
@@ -99,7 +99,7 @@ void Log::write_log(int level, const char* format, ...) {
       this->m_today = my_tm.tm_mday;
       this->m_count = 0;
     } else {
-      snprintf(new_log, 255, "%s%s%s.%11d", dir_name, tail, log_name, this->m_count / this->m_max_lines);
+      snprintf(new_log, 255, "%s%s%s.%lld", dir_name, tail, log_name, this->m_count / this->m_max_lines);
     }
     this->m_fp = fopen(new_log, "a");
   }

@@ -11,6 +11,7 @@
 #include <mysql/mysql.h>
 #include <netinet/in.h>
 #include <sys/epoll.h>
+#include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -20,6 +21,8 @@
 #include <string>
 
 #include "../CGImysql/sql_connection_pool.h"
+#include "../locker/locker.h"
+#include "../log/log.h"
 
 class http_conn {
  public:

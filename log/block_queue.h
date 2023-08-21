@@ -104,6 +104,7 @@ class block_queue {
     }
     item = this->m_queue.front();
     this->m_queue.pop();
+    this->m_mutex.unlock();
     return true;
   }
 
