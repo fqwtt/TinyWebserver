@@ -21,7 +21,7 @@
 #include <string>
 
 #include "../CGImysql/sql_connection_pool.h"
-#include "../locker/locker.h"
+#include "../lock/locker.h"
 #include "../log/log.h"
 
 class http_conn {

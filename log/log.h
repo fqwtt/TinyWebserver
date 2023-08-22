@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-#include "../locker/locker.h"
+#include "../lock/locker.h"
 #include "./block_queue.h"
 using namespace std;
 

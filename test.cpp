@@ -1,43 +1,64 @@
-/*************************************************************************
-  > File Name: test.cpp
-  > Author: fqwtt
-  > Created Time: 2023年04月27日 星期四 22时08分32秒
- ************************************************************************/
-
-#include <fcntl.h>
-#include <unistd.h>
-
-#include <cstdio>
 #include <cstring>
 #include <iostream>
+#include <queue>
+#include <thread>
+
+#include "./lock/locker.h"
+#include "./log/log.h"
+
+using namespace std;
+class threadPool {
+ public:
+  threadPool(int thread_number, int max_queue_size) {
+    m_thread_number = thread_number;
+    m_max_queue_size = max_queue_size;
+    vector<thread> m_threads;
+    for (int i = 0; i < thread_number; i++) {
+      m_threads.emplace_back(thread(worker, this));
+      m_threads[i].detach();
+    }
+  }
+  void run() {
+    while (true) {
+      m_sem.wait();
+      m_locker.lock();
+      if (works.empty()) {
+        m_locker.unlock();
+        continue;
+      }
+      int n = works.front();
+      works.pop();
+      cout << std::this_thread::get_id() << ":" << n << endl;
+      m_locker.unlock();
+    }
+  }
+  static void* worker(void* args) {
+    threadPool* pool = (threadPool*)args;
+    pool->run();
+    return pool;
+  }
+
+  void append(int num) {
+    m_locker.lock();
+    works.push(num);
+    m_locker.unlock();
+    m_sem.post();
+  }
+
+ public:
+  sem m_sem;
+  locker m_locker;
+  int m_thread_number;
+  int m_max_queue_size;
+  queue<int> works;
+};
 
 int main() {
-  // 创建文件描述符
-  int fd = open("../test.txt", O_RDONLY);
-  if (fd < 0) {
-    std::cerr << "Failed to open file." << std::endl;
-    return -1;
+  threadPool threads(2, 4);
+  while (true) {
+    int a;
+    cin >> a;
+    threads.append(a);
   }
-
-  // 将文件描述符设置为非阻塞模式
-  int old_option = fcntl(fd, F_GETFL);
-  int new_option = old_option | O_NONBLOCK;
-  fcntl(fd, F_SETFL, new_option);
-
-  // 读取文件
-  char buffer[1024];
-  int n = read(fd, buffer, sizeof(buffer));
-  if (n < 0) {
-    std::cerr << "Failed to read file." << std::endl;
-  } else {
-    std::cout << "Read " << n << " bytes: " << buffer << std::endl;
-  }
-
-  // 恢复文件描述符的阻塞模式
-  fcntl(fd, F_SETFL, old_option);
-
-  // 关闭文件描述符
-  close(fd);
-
   return 0;
 }

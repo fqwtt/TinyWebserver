@@ -10,7 +10,7 @@
 #include <iostream>
 #include <queue>
 
-#include "../locker/locker.h"
+#include "../lock/locker.h"
 using namespace std;
 
 template <typename T>

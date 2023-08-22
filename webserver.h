@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include "./http/http_conn.h"
+#include "./threadpool/threadpool.h"
 #include "./timer/lst_timer.h"
 
 using namespace std;
@@ -60,6 +61,29 @@ class WebServer {
   int m_pipefd[2];
   int m_epollfd;
   http_conn* users;
+
+  // 数据库相关
+  connection_pool* m_connPoll;
+  string m_user;
+  string m_passWord;
+  string m_databaseName;
+  int m_sql_num;
+
+  // 线程池相关
+  threadpool<http_conn>* m_pool;
+  int m_thread_num;
+
+  // epoll_event相关
+  epoll_event events[MAX_EVENT_NUMBER];
+  int m_listenfd;
+  int m_OPT_LINGER;
+  int m_TRIGMode;
+  int m_LISTENTrigmode;
+  int m_CONNTrigmode;
+
+  // 定时器相关
+  client_data* users_timer;
+  Utils utils;
 };
 
 #endif
