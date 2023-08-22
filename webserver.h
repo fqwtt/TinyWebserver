@@ -6,9 +6,11 @@
 #ifndef WEBSERVER_H
 #define WEBSERVER_H
 
+#include <signal.h>
 #include <stdlib.h>
 
 #include <arpa/inet.h>
+#include <fcntl.h>
 #include <netinet/in.h>
 #include <sys/epoll.h>
 #include <sys/socket.h>
@@ -63,7 +65,7 @@ class WebServer {
   http_conn* users;
 
   // 数据库相关
-  connection_pool* m_connPoll;
+  connection_pool* m_connPool;
   string m_user;
   string m_passWord;
   string m_databaseName;

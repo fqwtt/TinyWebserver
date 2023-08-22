@@ -4,9 +4,9 @@
   > Created Time: 2023年05月30日 星期二 21时46分25秒
  ************************************************************************/
 
-#include "webserver.h"
-
 #include <iostream>
+
+#include "webserver.h"
 
 using namespace std;
 
@@ -47,7 +47,27 @@ void WebServer::init(int port, string user, string passWord, string databaseName
   m_actorModel = actorModel;
 }
 
-void WebServer::threadPool() {
+void WebServer::threadPool() { m_pool = new threadpool<http_conn>(m_actorModel, m_connPool, m_thread_num); }
+
+void WebServer::sqlPool() {
+  m_connPool = connection_pool::GetInstance();
+  m_connPool->init("8.146.250.215", m_user, m_passWord, m_databaseName, 3306, m_sql_num, m_closeLog);
+
+  //初始化数据库读取表
+  users->initmysql_result(m_connPool);
+}
+
+void WebServer::logWrite() {
+  if (0 == m_closeLog) {
+    if (1 == m_logWrite) {
+      Log::get_instance()->init("./ServerLog", m_closeLog, 2000, 800000, 800);
+    } else {
+      Log::get_instance()->init("./ServerLog", m_closeLog, 2000, 800000, 0);
+    }
+  }
+}
+
+void WebServer::trigMode() {
   // LT+LT
   if (0 == m_TRIGMode) {
     m_LISTENTrigmode = 0;
@@ -70,13 +90,57 @@ void WebServer::threadPool() {
   }
 }
 
-void WebServer::sqlPool() {}
+void WebServer::eventListen() {
+  m_listenfd = socket(PF_INET, SOCK_STREAM, 0);
+  assert(m_listenfd >= 0);
 
-void WebServer::logWrite() {}
+  if (0 == m_OPT_LINGER) {
+    struct linger tmp = {0, 1};
+    setsockopt(m_listenfd, SOL_SOCKET, SO_LINGER, &tmp, sizeof(tmp));
+  } else if (1 == m_OPT_LINGER) {
+    struct linger tmp = {1, 1};
+    setsockopt(m_listenfd, SOL_SOCKET, SO_LINGER, &tmp, sizeof(tmp));
+  }
 
-void WebServer::trigMode() {}
+  int ret = 0;
+  struct sockaddr_in address;
+  bzero(&address, sizeof(address));
+  address.sin_family = AF_INET;
+  address.sin_addr.s_addr = htonl(INADDR_ANY);
+  address.sin_port = htons(m_port);
 
-void WebServer::eventListen() {}
+  int flag = 1;
+  setsockopt(m_listenfd, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag));
+  ret = bind(m_listenfd, (struct sockaddr*)&address, sizeof(address));
+  assert(ret >= 0);
+  ret = listen(m_listenfd, 5);
+  assert(ret >= 0);
+
+  utils.init(TIMESLOT);
+
+  // epoll创建内核事件表
+  epoll_event events[MAX_EVENT_NUMBER];
+  m_epollfd = epoll_create(5);
+  assert(m_epollfd != -1);
+
+  utils.addfd(m_epollfd, m_listenfd, false, m_LISTENTrigmode);
+  http_conn::m_epollfd = m_epollfd;
+
+  ret = socketpair(PF_UNIX, SOCK_STREAM, 0, m_pipefd);
+  assert(ret != -1);
+  utils.setnonblocking(m_pipefd[1]);
+  utils.addfd(m_epollfd, m_pipefd[0], false, 0);
+
+  utils.addsig(SIGPIPE, SIG_IGN);
+  utils.addsig(SIGALRM, utils.sig_handler, false);
+  utils.addsig(SIGTERM, utils.sig_handler, false);
+
+  alarm(TIMESLOT);
+
+  //工具类，信号和描述符基础操作
+  Utils::u_pipefd = m_pipefd;
+  Utils::u_epollfd = m_epollfd;
+}
 
 void WebServer::eventLoop() {}
 
