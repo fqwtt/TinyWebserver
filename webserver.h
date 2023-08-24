@@ -51,15 +51,24 @@ class WebServer {
 
   void timer(int connfd, sockaddr_in client_address);
 
-  void adjustTimer(util_timer* timer, int sockfd);
+  void adjustTimer(util_timer* timer);
+
+  void deal_timer(util_timer* timer, int sockfd);
+
+  bool dealclientdata();
+
+  bool dealwithsignal(bool& timeout, bool& stop_server);
+
+  void dealwithread(int sockfd);
+
+  void dealwithwrite(int sockfd);
 
  public:
   int m_port;
   char* m_root;
   int m_logWrite;
-  int m_closeLog;
+  int m_close_log;
   int m_actorModel;
-
   int m_pipefd[2];
   int m_epollfd;
   http_conn* users;

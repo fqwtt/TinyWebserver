@@ -12,7 +12,7 @@ execute_process(COMMAND mysql_config --libs
 OUTPUT_VARIABLE MYSQL_LIBS OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 # 添加可执行文件
-add_executable(main main.cpp CGImysql/sql_connection_pool.cpp http/http_conn.cpp log/log.cpp webserver.cpp config.cpp)
+add_executable(main main.cpp CGImysql/sql_connection_pool.cpp http/http_conn.cpp log/log.cpp webserver.cpp config.cpp timer/lst_timer.cpp)
 add_executable(test test.cpp log/log.cpp)
 
 target_compile_options(main PUBLIC ${MYSQL_CFLAGS})
