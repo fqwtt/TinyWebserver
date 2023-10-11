@@ -4,9 +4,9 @@
   > Created Time: 2023年05月30日 星期二 21时46分25秒
  ************************************************************************/
 
-#include "webserver.h"
-
 #include <iostream>
+
+#include "webserver.h"
 
 using namespace std;
 
@@ -20,6 +20,8 @@ WebServer::WebServer() {
   m_root = (char*)malloc(strlen(server_path) + strlen(root) + 1);
   strcpy(m_root, server_path);
   strcat(m_root, root);
+
+  users_timer = new client_data[MAX_FD];
 }
 
 WebServer::~WebServer() {
@@ -52,7 +54,6 @@ void WebServer::threadPool() { m_pool = new threadpool<http_conn>(m_actorModel, 
 void WebServer::sqlPool() {
   m_connPool = connection_pool::GetInstance();
   m_connPool->init("8.146.250.215", m_user, m_passWord, m_databaseName, 3306, m_sql_num, m_close_log);
-
   // 初始化数据库读取表
   users->initmysql_result(m_connPool);
 }
@@ -145,12 +146,14 @@ void WebServer::eventListen() {
 void WebServer::eventLoop() {
   bool timeout = false;
   bool stop_server = false;
+
   while (!stop_server) {
     int number = epoll_wait(m_epollfd, events, MAX_EVENT_NUMBER, -1);
     if (number < 0 && errno != EINTR) {
       LOG_ERROR("%s", "epoll failure");
       break;
     }
+    cout << number << endl;
     for (int i = 0; i < number; i++) {
       int sockfd = events[i].data.fd;
       // 处理新的客户连接
@@ -166,17 +169,17 @@ void WebServer::eventLoop() {
         bool flag = dealwithsignal(timeout, stop_server);
         if (false == flag) {
           LOG_ERROR("%s", "dealclientdata failure");
-        } else if (events[i].events & EPOLLIN) {
-          dealwithread(sockfd);
-        } else if (events[i].events & EPOLLOUT) {
-          dealwithwrite(sockfd);
         }
+      } else if (events[i].events & EPOLLIN) {
+        dealwithread(sockfd);
+      } else if (events[i].events & EPOLLOUT) {
+        dealwithwrite(sockfd);
       }
-      if (timeout) {
-        utils.timer_handler();
-        LOG_INFO("%s", "timer tick");
-        timeout = false;
-      }
+    }
+    if (timeout) {
+      utils.timer_handler();
+      LOG_INFO("%s", "timer tick");
+      timeout = false;
     }
   }
 }
@@ -209,7 +212,7 @@ void WebServer::deal_timer(util_timer* timer, int sockfd) {
   if (timer) {
     utils.m_timer_lst.del_timer(timer);
   }
-  LOG_INFO("%s", "adjust timer once");
+  LOG_INFO("close fd %d", users_timer[sockfd].sockfd);
 }
 
 bool WebServer::dealclientdata() {

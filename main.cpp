@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
 
   // 触发模式
   server.trigMode();
-  
+
   // 监听
   server.eventListen();
 

@@ -3,9 +3,9 @@
   > Author: fqwtt
   > Created Time: 2023年05月31日 星期三 9时19分33秒
  ************************************************************************/
-#include "http_conn.h"
-
 #include <fstream>
+
+#include "http_conn.h"
 
 const char* ok_200_title = "OK";
 const char* error_400_title = "Bad Request";
@@ -239,7 +239,7 @@ http_conn::HTTP_CODE http_conn::parse_headers(char* text) {
       return NO_REQUEST;
     }
     return GET_REQUEST;
-  } else if (strncasecmp(text, "COnnection:", 11) == 0) {
+  } else if (strncasecmp(text, "Connection:", 11) == 0) {
     text += 11;
     text += strspn(text, " \t");
     if (strcasecmp(text, "keep-alive") == 0) m_linger = true;
