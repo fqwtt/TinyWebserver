@@ -23,10 +23,12 @@ std::map<std::string, std::string> users;
 void http_conn::initmysql_result(connection_pool* connPool) {
   MYSQL* mysql = NULL;
   connectionRAII mysqlcon(&mysql, connPool);
+
   if (mysql_query(mysql, "SELECT username, passwd FROM user")) {
-    printf("SELECT error:%s\n", mysql_error(mysql));  // 后续修改
+    LOG_ERROR("SELECT error:%s\n", mysql_error(mysql));
     return;
   }
+
   MYSQL_RES* result = mysql_store_result(mysql);
   int num_fileds = mysql_num_fields(result);
   MYSQL_FIELD* fields = mysql_fetch_fields(result);
@@ -82,7 +84,7 @@ int http_conn::m_epollfd = -1;
 
 // 关闭连接，每关闭一个连接，客户总量减一
 void http_conn::close_conn(bool real_close) {
-  if (real_close && (m_sockfd != 1)) {
+  if (real_close && (m_sockfd != -1)) {
     printf("close %d", m_sockfd);
     removefd(m_epollfd, m_sockfd);
     m_sockfd -= 1;
@@ -272,10 +274,10 @@ http_conn::HTTP_CODE http_conn::process_read() {
   char* text = 0;
 
   while ((m_check_state == CHECK_STATE_CONTENT && line_status == LINE_OK) ||
-         ((line_status == parse_line()) == LINE_OK)) {
+         ((line_status = parse_line()) == LINE_OK)) {
     text = get_line();
     m_start_line = m_checked_idx;
-    cout << text << endl;  // 需要修改为log
+    LOG_INFO("%s", text);
     switch (m_check_state) {
       case CHECK_STATE_REQUESTLINE: {
         ret = parse_request_line(text);
@@ -354,7 +356,7 @@ http_conn::HTTP_CODE http_conn::do_request() {
       if (users.find(name) != users.end() && users[name] == password)
         strcpy(m_url, "/welcome.html");
       else
-        strcpy(m_url, "logError.html");
+        strcpy(m_url, "/logError.html");
     }
   }
   if (*(p + 1) == '0') {
@@ -409,6 +411,7 @@ bool http_conn::write() {
     return true;
   }
   while (1) {
+    temp = writev(m_sockfd, m_iv, m_iv_count);
     if (temp < 0) {
       if (errno == EAGAIN) {
         modfd(m_epollfd, m_sockfd, EPOLLOUT, m_TRIGMode);

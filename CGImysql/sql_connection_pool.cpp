@@ -74,13 +74,13 @@ void connection_pool::init(string host, string User, string Passward, string Dat
     MYSQL* conn = NULL;
     conn = mysql_init(conn);
     if (!conn) {
-      cout << "error" << endl;  // 需要修改
+      LOG_ERROR("MySQL Error");
       exit(1);
     }
     conn =
         mysql_real_connect(conn, host.c_str(), User.c_str(), Passward.c_str(), DataBaseName.c_str(), port, nullptr, 0);
     if (!conn) {
-      cout << "error" << endl;  // 需要修改
+      LOG_ERROR("MySQL Error");
       exit(1);
     }
     this->m_connList.push_back(conn);

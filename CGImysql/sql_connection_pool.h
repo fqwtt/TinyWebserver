@@ -12,7 +12,7 @@
 #include <iostream>
 #include <list>
 #include <mutex>
-
+#include "../log/log.h"
 using namespace std;
 
 class connection_pool {

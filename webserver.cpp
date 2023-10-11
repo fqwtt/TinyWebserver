@@ -153,7 +153,7 @@ void WebServer::eventLoop() {
       LOG_ERROR("%s", "epoll failure");
       break;
     }
-    cout << number << endl;
+
     for (int i = 0; i < number; i++) {
       int sockfd = events[i].data.fd;
       // 处理新的客户连接

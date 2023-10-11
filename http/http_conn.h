@@ -14,7 +14,7 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
-
+#include <sys/uio.h>
 #include <cstring>
 #include <map>
 #include <mutex>
